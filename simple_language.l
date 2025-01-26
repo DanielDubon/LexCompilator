@@ -15,7 +15,8 @@
 "="                     { return '='; }
 ":"                     { return ':'; }
 [ \t]                   ;  // skip whitespace
-.|\n                    ; /* ignore all the rest */
+\n                      ;  // ignore newlines
+.                       { printf("Error: Token no reconocido '%s'\n", yytext); }
 
 %%
 

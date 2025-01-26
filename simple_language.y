@@ -29,6 +29,10 @@ statement_list: statement
 
 statement: assignment
     | expression ':'          { std::cout << $1 << std::endl; }
+    | error ':'               { 
+                                  yyerror("Entrada inválida."); 
+                                  yyerrok;
+                              }
     ;
 
 assignment: ID '=' expression
@@ -40,11 +44,26 @@ assignment: ID '=' expression
     ;
 
 expression: NUMBER                  { $$ = $1; }
-    | ID                            { $$ = vars[*$1];      delete $1; }
+    | ID                             { 
+                                        if (vars.find(*$1) == vars.end()) {
+                                            std::cout << "Error: variable " << *$1 << " no está definida." << std::endl;
+                                            $$ = 0; 
+                                        } else {
+                                            $$ = vars[*$1];
+                                        }
+                                        delete $1;
+                                    }
     | expression '+' expression     { $$ = $1 + $3; }
     | expression '-' expression     { $$ = $1 - $3; }
     | expression '*' expression     { $$ = $1 * $3; }
-    | expression '/' expression     { $$ = $1 / $3; }
+    | expression '/' expression      { 
+                                        if ($3 == 0) {
+                                            std::cout << "Error: División por cero." << std::endl;
+                                            $$ = 0; 
+                                        } else {
+                                            $$ = $1 / $3; 
+                                        }
+                                    }
     ;
 
 %%
